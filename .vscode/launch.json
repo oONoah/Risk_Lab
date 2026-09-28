@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "RiskLab: loader module",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "risklab.loader",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}\\src"
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}
