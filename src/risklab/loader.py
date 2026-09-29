@@ -1,5 +1,6 @@
 import pandas as pd
 import yfinance as yf
+import fastparquet
 
 if __package__:
     from .config import DATA_RAW
@@ -42,4 +43,4 @@ def fetch_yahoo(
 
 
 
-fetch_yahoo("AAPl")
+fetch_yahoo("AAPL")
