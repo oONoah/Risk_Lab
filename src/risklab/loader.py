@@ -1,4 +1,5 @@
 import pandas as pd
+import pyarrow.parquet as pq
 import yfinance as yf
 import fastparquet
 
@@ -35,9 +36,11 @@ def fetch_yahoo(
     filepath = DATA_RAW / filename
 
     if filepath.exists():
-        return pd.read_parquet(filepath)
+        cached = pq.read_table(filepath).to_pandas(ignore_metadata=True)
+        cached["Date"] = pd.to_datetime(cached["Date"].astype("int64"), unit="ms")
+        return cached.set_index("Date")
 
-    df_raw.to_parquet(filepath)
+    df_raw.to_parquet(filepath, engine="pyarrow")
     return df_raw
 
 
