@@ -41,6 +41,9 @@ def prepare_returns(
 
     df["Return"] = (df["Close"] - df["Open"]) / df["Open"]
     df["LogReturn"] = np.log(df["Close"] / df["Close"].shift(1))
+    df["RollingVolatility20"] = df["Return"].rolling(window=20).std()
+    df["RollingReturn20"] = df["Return"].rolling(window=20).mean()
+    anualized_volatility = df["Return"].std() * np.sqrt(252)
 
     print(df.tail(10))
 
