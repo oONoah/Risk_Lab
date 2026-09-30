@@ -1,5 +1,6 @@
 from ast import literal_eval
 
+import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
@@ -39,6 +40,7 @@ def prepare_returns(
     ]
 
     df["Return"] = (df["Close"] - df["Open"]) / df["Open"]
+    df["LogReturn"] = np.log(df["Close"] / df["Close"].shift(1))
 
     print(df.tail(10))
 
