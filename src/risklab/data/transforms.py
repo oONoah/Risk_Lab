@@ -5,7 +5,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 if __package__:
-    from .config import DATA_PROCESSED, DATA_RAW
+    from ..config import DATA_PROCESSED, DATA_RAW
 else:
     import sys
     from pathlib import Path
@@ -43,9 +43,7 @@ def prepare_returns(
     df["LogReturn"] = np.log(df["Close"] / df["Close"].shift(1))
     df["RollingVolatility20"] = df["Return"].rolling(window=20).std()
     df["RollingReturn20"] = df["Return"].rolling(window=20).mean()
-    anualized_volatility = df["Return"].std() * np.sqrt(252)
-
-    print(df.tail(10))
+    annualized_volatility = df["Return"].std() * np.sqrt(252)
 
 
     if end is None:
