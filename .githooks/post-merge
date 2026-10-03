@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ -x "venv/Scripts/python.exe" ]; then
+    PYTHON="venv/Scripts/python.exe"
+elif [ -x ".venv/Scripts/python.exe" ]; then
+    PYTHON=".venv/Scripts/python.exe"
+else
+    PYTHON="python"
+fi
+
+printf '\nRunning tests after git pull...\n'
+"$PYTHON" -m pytest -q
