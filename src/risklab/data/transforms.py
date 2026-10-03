@@ -40,8 +40,6 @@ def prepare_returns(
     ]
 
 
-
-
     if end is None:
         end = str(df.iloc[-1].name)[:10]
 
@@ -55,14 +53,18 @@ def prepare_returns(
 
     df.to_parquet(filepath, engine="pyarrow")
 
+    df = calculate_return(df)
+
     return df
 
-def calculate_return(prices: pd.DataFrame) -> pd.DataFrame: 
-    prices["Return"] = (df["Close"] - df["Open"]) / df["Open"]
-    prices["LogReturn"] = np.log(df["Close"] / df["Close"].shift(1))
-    prices["RollingVolatility20"] = df["Return"].rolling(window=20).std()
-    prices["RollingReturn20"] = df["Return"].rolling(window=20).mean()
+def calculate_return(df: pd.DataFrame) -> pd.DataFrame:
+    results = df.copy()   
+     
+    results["Return"] = (results["Close"] - results["Open"]) / results["Open"]
+    results["LogReturn"] = np.log(results["Close"] / results["Close"].shift(1))
+    results["RollingVolatility20"] = results["Return"].rolling(window=20).std()
+    results["RollingReturn20"] = results["Return"].rolling(window=20).mean()
 
-    return prices
+    return results
 
 

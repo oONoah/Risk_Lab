@@ -1,16 +1,10 @@
-import sys 
+import sys
+
+from risklab.risk import historical_var
+from risklab.data import calculate_return, fetch_yahoo, prepare_returns
 
 
-def main():
-    print("CLI Smoke Test funktioniert")
-    print("Python Version:", sys.version)
-
-    name = input("Wie ist dein Name? ")
-    print(f"Hallo, {name} das CLI Programm funktioniert!")
-
-if __name__ == "__main__":
-    main()
-
-def add(a, b):
-    return a + b    
+df = fetch_yahoo(ticker="AAPL")
+df.
+print(df.head(10))
 
