@@ -1,4 +1,5 @@
 from ast import literal_eval
+from .loader import fetch_yahoo
 
 import numpy as np
 import pandas as pd
@@ -17,6 +18,9 @@ else:
 def prepare_returns(
     ticker: str, start: str = "2010-01-01", end: str | None = None
 ) -> pd.DataFrame:
+
+    df = fetch_yahoo(ticker, start, end)
+    
     files = [
         file.name
         for file in DATA_RAW.iterdir()
@@ -51,9 +55,9 @@ def prepare_returns(
         cached["Date"] = pd.to_datetime(cached["Date"].astype("int64"), unit="ms")
         return cached.set_index("Date")
 
-    df.to_parquet(filepath, engine="pyarrow")
-
     df = calculate_return(df)
+
+    df.to_parquet(filepath, engine="pyarrow")
 
     return df
 
