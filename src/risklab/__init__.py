@@ -1,11 +1,11 @@
-from .data import fetch_yahoo
+from .data import calculate_return, fetch_yahoo, prepare_returns
 from .risk import historical_var
 
 __all__ = [
+    "calculate_return",
     "fetch_yahoo",
     "prepare_returns",
-    "calculate_return",
-    "historical_var"
+    "historical_var",
 ]
 
 __version__ = "0.1.0"
