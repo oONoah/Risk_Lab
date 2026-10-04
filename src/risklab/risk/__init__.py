@@ -1,3 +1,3 @@
-from .var import historical_var
+from .var import expected_shortfall, historical_var
 
-__all__ = ["historical_var"]
+__all__ = ["expected_shortfall", "historical_var"]
