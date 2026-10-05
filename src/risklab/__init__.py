@@ -1,4 +1,5 @@
 from .data import calculate_return, fetch_yahoo, prepare_returns
+from .portfolio import portfolio_returns
 from .risk import expected_shortfall, historical_var
 
 __all__ = [
@@ -6,6 +7,7 @@ __all__ = [
     "expected_shortfall",
     "fetch_yahoo",
     "prepare_returns",
+    "portfolio_returns",
     "historical_var",
 ]
 
