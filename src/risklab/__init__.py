@@ -1,5 +1,5 @@
 from .data import calculate_return, fetch_yahoo, prepare_returns
-from .portfolio import portfolio_returns, export_portfolio_returns
+from .portfolio import export_portfolio_returns, import_returns_csv, portfolio_returns
 from .risk import expected_shortfall, historical_var
 
 __all__ = [
@@ -9,7 +9,8 @@ __all__ = [
     "prepare_returns",
     "portfolio_returns",
     "historical_var",
-    "export_portfolio_returns"
+    "export_portfolio_returns",
+    "import_returns_csv",
 ]
 
 __version__ = "0.1.0"
