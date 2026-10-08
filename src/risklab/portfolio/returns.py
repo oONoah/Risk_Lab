@@ -11,7 +11,7 @@ def portfolio_returns(
     """Calculate weighted portfolio returns from aligned asset returns.
 
     Rows containing a missing asset return are excluded so every portfolio
-    return uses the same set of assets.
+    return uses the same set of assets
     """
     if asset_returns.empty:
         raise ValueError("asset_returns darf nicht leer sein")
