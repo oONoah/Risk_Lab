@@ -1,12 +1,27 @@
-import sys
+from pathlib import Path
 
-from risklab import historical_var
-from risklab.data import calculate_return, fetch_yahoo, prepare_returns
-from risklab.portfolio import portfolio_variance, portfolio_returns, covariance_matrix
+from risklab import (
+    covariance_matrix,
+    import_returns_csv,
+    portfolio_variance,
+)
 
+returns = import_returns_csv(
+    Path("data/simulated/example_portfolio_returns.csv")
+)
 
-df = prepare_returns(ticker="AAPL", start="2020-01-01", end="2025-12-31")
+weights = {
+    "AAPL": 0.40,
+    "MSFT": 0.30,
+    "GLD": 0.20,
+    "TLT": 0.10,
+}
 
+covariance = covariance_matrix(returns)
+variance = portfolio_variance(covariance, weights)
+volatility = variance**0.5
 
-print("test commit")
-print(historical_var(df["Returns"], 0.9))
+print(returns)
+print(covariance)
+print(f"Portfolio variance: {variance:.12f}")
+print(f"Portfolio volatility: {volatility:.12f}")
