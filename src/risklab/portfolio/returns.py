@@ -77,3 +77,40 @@ def covariance_matrix(
         raise ValueError("retturns must contain at least one row")
 
     return clean_returns.cov()
+
+
+def portfolio_variance(
+    covariance: pd.DataFrame,
+    weights: Mapping[str, float] | Sequence[float],
+) -> float:
+    """Calculate portfolio variance from a covariance matrix and weights."""
+    if covariance.empty or covariance.shape[0] != covariance.shape[1]:
+        raise ValueError("covariance muss eine nicht-leere quadratische Matrix sein")
+
+    if isinstance(weights, Mapping):
+        missing = [column for column in covariance.columns if column not in weights]
+        extra = [column for column in weights if column not in covariance.columns]
+        if missing or extra:
+            raise ValueError(
+                f"weights müssen exakt zur Kovarianzmatrix passen; "
+                f"fehlend={missing}, unbekannt={extra}"
+            )
+        weight_values = np.asarray(
+            [weights[column] for column in covariance.columns],
+            dtype=float,
+        )
+    else:
+        weight_values = np.asarray(weights, dtype=float)
+        if weight_values.ndim != 1 or len(weight_values) != covariance.shape[0]:
+            raise ValueError(
+                "Anzahl der weights muss der Asset-Anzahl entsprechen"
+            )
+
+    if not np.isfinite(weight_values).all():
+        raise ValueError("weights müssen endlich sein")
+
+    covariance_values = covariance.to_numpy(dtype=float)
+    if not np.isfinite(covariance_values).all():
+        raise ValueError("covariance muss endliche Werte enthalten")
+
+    return float(weight_values @ covariance_values @ weight_values)
