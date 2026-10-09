@@ -54,3 +54,26 @@ def portfolio_returns(
     result = clean_returns.mul(weight_values, axis="columns").sum(axis="columns")
     result.name = "PortfolioReturn"
     return result
+
+
+def covariance_matrix(
+        returns: pd.DataFrame
+) -> pd.DataFrame:
+    
+    if returns.empty:
+        raise ValueError("Returns must not be empty")
+
+    if returns.columns.empty:
+        raise ValueError("Columns must not be empty")
+
+    try:
+        numeric_returns = returns.astype(float)
+    except (TypeError, ValueError) as error:
+        raise ValueError("Returns must consist of numeric values") from error
+
+    clean_returns = numeric_returns.dropna(how="any")
+
+    if clean_returns.empty:
+        raise ValueError("retturns must contain at least one row")
+
+    return clean_returns.cov()
