@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 from risklab import portfolio_returns
+from risklab.portfolio.returns import covariance_matrix, portfolio_variance
 
 
 def test_portfolio_returns_apply_weights() -> None:
@@ -47,3 +48,90 @@ def test_portfolio_returns_reject_invalid_weights(weights) -> None:
 
     with pytest.raises(ValueError):
         portfolio_returns(asset_returns, weights)
+
+
+def test_covariance_matrix_calculates_sample_covariance() -> None:
+    asset_returns = pd.DataFrame(
+        {
+            "AAPL": [1.0, 2.0, 3.0],
+            "MSFT": [2.0, 4.0, 8.0],
+        }
+    )
+
+    result = covariance_matrix(asset_returns)
+
+    expected = pd.DataFrame(
+        [[1.0, 3.0], [3.0, 9.0]],
+        index=["AAPL", "MSFT"],
+        columns=["AAPL", "MSFT"],
+    )
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_covariance_matrix_uses_complete_rows_only() -> None:
+    asset_returns = pd.DataFrame(
+        {
+            "AAPL": [1.0, None, 3.0],
+            "MSFT": [2.0, 4.0, 8.0],
+        }
+    )
+
+    result = covariance_matrix(asset_returns)
+
+    expected = pd.DataFrame(
+        [[2.0, 6.0], [6.0, 18.0]],
+        index=["AAPL", "MSFT"],
+        columns=["AAPL", "MSFT"],
+    )
+    pd.testing.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "weights",
+    [
+        {"AAPL": 0.25, "MSFT": 0.75},
+        [0.25, 0.75],
+    ],
+)
+def test_portfolio_variance_combines_weights_and_covariance(weights) -> None:
+    covariance = pd.DataFrame(
+        [[1.0, 3.0], [3.0, 9.0]],
+        index=["AAPL", "MSFT"],
+        columns=["AAPL", "MSFT"],
+    )
+
+    result = portfolio_variance(covariance, weights)
+
+    assert result == pytest.approx(6.25)
+
+
+def test_portfolio_variance_aligns_mapping_weights_to_columns() -> None:
+    covariance = pd.DataFrame(
+        [[1.0, 3.0], [3.0, 9.0]],
+        index=["AAPL", "MSFT"],
+        columns=["AAPL", "MSFT"],
+    )
+
+    result = portfolio_variance(covariance, {"MSFT": 0.75, "AAPL": 0.25})
+
+    assert result == pytest.approx(6.25)
+
+
+@pytest.mark.parametrize(
+    "weights",
+    [
+        [1.0],
+        [0.5, 0.5, 0.0],
+        {"AAPL": 1.0},
+        {"AAPL": 0.5, "MSFT": 0.5, "SPY": 0.0},
+    ],
+)
+def test_portfolio_variance_rejects_weights_with_wrong_assets(weights) -> None:
+    covariance = pd.DataFrame(
+        [[1.0, 3.0], [3.0, 9.0]],
+        index=["AAPL", "MSFT"],
+        columns=["AAPL", "MSFT"],
+    )
+
+    with pytest.raises(ValueError):
+        portfolio_variance(covariance, weights)
