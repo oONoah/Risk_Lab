@@ -2,6 +2,7 @@ import sys
 
 from risklab import historical_var
 from risklab.data import calculate_return, fetch_yahoo, prepare_returns
+from risklab.portfolio import portfolio_variance, portfolio_returns, covariance_matrix
 
 
 df = prepare_returns(ticker="AAPL", start="2020-01-01", end="2025-12-31")
