@@ -3,4 +3,4 @@
 __pycache__/
 *.py[cod]
 *.parquet
-/src/risklab/main.py
+/src/main.py
