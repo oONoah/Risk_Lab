@@ -37,4 +37,4 @@ def import_returns_csv(
     if numeric_returns.dropna(how="all").empty:
         raise ValueError("CSV-Datei muss mindestens einen Return-Wert enthalten")
 
-    return numeric_returns +1
+    return numeric_returns 
