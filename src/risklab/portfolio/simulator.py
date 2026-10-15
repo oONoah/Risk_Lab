@@ -26,11 +26,6 @@ def price_knockout_option_mc(
 
     min_prices = np.min(paths, axis=1)
     survived = min_prices >= barrier
-    print(min_prices)
-    print(survived)
-    
-
-
 
     return float(np.mean(survived * payoff_amount))
 
