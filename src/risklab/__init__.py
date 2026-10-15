@@ -1,6 +1,6 @@
 from .data import calculate_return, fetch_yahoo, prepare_returns
 from .portfolio import export_portfolio_returns, import_returns_csv, portfolio_returns, portfolio_variance, covariance_matrix
-from .risk import expected_shortfall, historical_var
+from .risk import expected_shortfall, historical_var, kupiec_pof, kupiec_tff
 
 __all__ = [
     "calculate_return",
@@ -12,7 +12,9 @@ __all__ = [
     "export_portfolio_returns",
     "import_returns_csv",
     "portfolio_variance",
-    "covariance_matrix"
+    "covariance_matrix",
+    "kupiec_pof",
+    "kupiec_tff"
 ]
 
 __version__ = "0.1.0"

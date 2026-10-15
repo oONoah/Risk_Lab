@@ -29,4 +29,28 @@ def kupiec_pof(
         "is_rejected": bool(is_rejected)
     }
 
-print(kupiec_pof_test(5,250))
+
+# Time until first failure
+def kupiec_tff (
+        first_failure_day: int,
+        confidance_level: float = 0.99
+) -> dict:
+
+
+    alpha = 1 - confidance_level
+
+    theory = alpha * (confidance_level)**(first_failure_day - 1) 
+    reality = (1/first_failure_day) * (1- (1/first_failure_day))**(first_failure_day-1)
+
+    tff = -2* np.log(theory/reality)
+
+    p_value = 1 - chi2.cdf(tff, df=1)
+    critical_value = chi2.ppf(confidance_level, df=1)
+
+    is_rejected = tff > critical_value
+
+    return {
+        "lr_tff": float(tff),
+        "p_value": float(p_value),
+        "is_rejected": bool(is_rejected)
+    }
