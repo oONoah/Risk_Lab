@@ -1,7 +1,26 @@
+import numpy as np
 import pandas as pd
 import pytest
 
-from risklab import expected_shortfall, historical_var
+from risklab import christoffersen, expected_shortfall, historical_var
+
+
+def test_christoffersen_returns_nan_for_hits_without_failures() -> None:
+    result = christoffersen(np.zeros(5, dtype=int))
+
+    assert np.isnan(result["lr_ind"])
+    assert np.isnan(result["p_value"])
+    assert result["is_rejected"] is False
+
+
+def test_christoffersen_calculates_independence_statistic() -> None:
+    hits = np.array([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1])
+
+    result = christoffersen(hits)
+
+    assert result["lr_ind"] == pytest.approx(0.1303319159)
+    assert result["p_value"] == pytest.approx(0.7180881451)
+    assert result["is_rejected"] is False
 
 
 def test_expected_shortfall_averages_losses_in_var_tail() -> None:

@@ -98,6 +98,4 @@ def christoffersen(
         "p_value": float(p_value),
         "is_rejected": bool(is_rejected)
     }
-
-print(christoffersen(np.array([0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,1])))
     
