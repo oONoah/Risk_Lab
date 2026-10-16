@@ -6,19 +6,20 @@ from scipy.stats import chi2
 def kupiec_pof(
         failures: int,
         observations: int,
-        confidence_level: float = 0.99
+        confidence_level: float = 0.99,
+        test_confidence: float = 0.95
 ) -> dict:
     
     alpha = 1 - confidence_level
     successes = observations - failures
 
     theory = confidence_level ** successes * alpha ** failures
-    realtiy = (1 - (failures/observations))**successes * (failures/observations)**failures
+    reality = (1 - (failures/observations))**successes * (failures/observations)**failures
 
-    pof = -2*np.log(theory/realtiy)
+    pof = -2*np.log(theory/reality)
     
     p_value = 1 - chi2.cdf(pof, df=1)
-    critical_value = chi2.ppf(confidence_level, df=1)
+    critical_value = chi2.ppf(test_confidence, df=1)
 
     is_rejected = pof > critical_value
     
@@ -33,19 +34,26 @@ def kupiec_pof(
 # Time until first failure
 def kupiec_tff (
         first_failure_day: int,
-        confidance_level: float = 0.99
+        confidence_level: float = 0.99,
+        test_confidence: float = 0.95
 ) -> dict:
 
+    if first_failure_day == 0:
+        return {
+            "lr_tff": np.nan,
+            "p_value": np.nan,
+            "is_rejected": False 
+        }
 
-    alpha = 1 - confidance_level
+    alpha = 1 - confidence_level
 
-    theory = alpha * (confidance_level)**(first_failure_day - 1) 
+    theory = alpha * (confidence_level)**(first_failure_day - 1) 
     reality = (1/first_failure_day) * (1- (1/first_failure_day))**(first_failure_day-1)
 
     tff = -2* np.log(theory/reality)
 
     p_value = 1 - chi2.cdf(tff, df=1)
-    critical_value = chi2.ppf(confidance_level, df=1)
+    critical_value = chi2.ppf(test_confidence, df=1)
 
     is_rejected = tff > critical_value
 
@@ -54,3 +62,42 @@ def kupiec_tff (
         "p_value": float(p_value),
         "is_rejected": bool(is_rejected)
     }
+
+
+# https://www.value-at-risk.net/backtesting-independence-tests/#exercise_14_6
+def christoffersen(
+        hits: np.ndarray,
+        test_confidence: float = 0.95  
+) -> dict:
+    n00 = np.sum((hits[:-1] == 0) & (hits[1:] == 0))
+    n01 = np.sum((hits[:-1] == 0) & (hits[1:] == 1))
+    n10 = np.sum((hits[:-1] == 1) & (hits[1:] == 0))
+    n11 = np.sum((hits[:-1] == 1) & (hits[1:] == 1))
+
+    if (n01 + n11) == 0:
+        print("Test")
+        return {
+            "lr_ind": np.nan,
+            "p_value": np.nan,
+            "is_rejected": False
+        }
+
+    q0 = n00 / (n00 + n01)
+    q1 = n10 / (n10 + n11)
+    qn = (n00 + n10) / (n00 + n01 + n10 + n11)
+    Lambda = ((1-qn)**(n01 + n11) * (qn)**(n00 + n10)) / ((1-q0)**n01 * q0**n00 * (1-q1)**n11 * q1**n10)
+
+    lr_ind = -2 * np.log(Lambda)
+    p_value = 1 - chi2.cdf(lr_ind, df=1)
+
+    critical_value = chi2.ppf(test_confidence, df=1)
+    is_rejected = lr_ind > critical_value
+
+    return {
+        "lr_ind": float(lr_ind),
+        "p_value": float(p_value),
+        "is_rejected": bool(is_rejected)
+    }
+
+print(christoffersen(np.array([0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,1])))
+    
