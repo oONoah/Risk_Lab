@@ -1,8 +1,20 @@
+import numpy as np
 import pandas as pd
 import pytest
 
 from risklab import covariance_matrix, portfolio_returns, portfolio_variance
 from risklab.portfolio.returns import covariance_matrix, portfolio_variance
+
+
+def test_simulated_portfolio_fixture_has_matching_dimensions(
+    simulated_portfolio,
+) -> None:
+    returns, weights = simulated_portfolio
+
+    assert returns.shape == (252, 3)
+    assert weights.shape == returns.shape
+    assert np.all(weights >= 0)
+    assert np.allclose(weights.sum(axis=1), 1.0)
 
 
 def test_portfolio_returns_apply_weights() -> None:
