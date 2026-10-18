@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
+TRADING_DAYS_PER_YEAR = 252
+
 if __package__:
     from ..config import DATA_PROCESSED
 else:
@@ -28,8 +30,9 @@ def prepare_returns(
 
     if filepath.exists():
         cached = pq.read_table(filepath).to_pandas(ignore_metadata=True)
-        cached["Date"] = pd.to_datetime(cached["Date"].astype("int64"), unit="ms")
-        return cached.set_index("Date")
+        if "Adj Close" in cached.columns:
+            cached["Date"] = pd.to_datetime(cached["Date"].astype("int64"), unit="ms")
+            return cached.set_index("Date")
 
     df = calculate_return(df)
 
@@ -38,11 +41,24 @@ def prepare_returns(
     return df
 
 def calculate_return(df: pd.DataFrame) -> pd.DataFrame:
-    results = df.copy()   
-     
-    results["Return"] = (results["Close"] - results["Open"]) / results["Open"]
-    results["LogReturn"] = np.log(results["Close"] / results["Close"].shift(1))
-    results["RollingVolatility20"] = results["Return"].rolling(window=20).std()
+    results = df.copy()
+    if "Adj Close" not in results.columns:
+        raise ValueError(
+            "Historische Renditen benötigen eine 'Adj Close'-Spalte."
+        )
+
+    adjusted_close = results["Adj Close"]
+    if isinstance(adjusted_close, pd.DataFrame):
+        if adjusted_close.shape[1] != 1:
+            raise ValueError("'Adj Close' muss genau einen Ticker enthalten.")
+        adjusted_close = adjusted_close.iloc[:, 0]
+
+    results["Return"] = adjusted_close.pct_change()
+    results["LogReturn"] = np.log(adjusted_close / adjusted_close.shift(1))
+    results["RollingVolatility20"] = (
+        results["LogReturn"].rolling(window=20).std()
+        * np.sqrt(TRADING_DAYS_PER_YEAR)
+    )
     results["RollingReturn20"] = results["Return"].rolling(window=20).mean()
 
     return results

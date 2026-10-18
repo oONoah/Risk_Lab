@@ -27,9 +27,16 @@ def fetch_yahoo(
     filepath = DATA_RAW / filename
 
     if filepath.exists():
-        return pd.read_parquet(filepath)
+        cached = pd.read_parquet(filepath)
+        if "Adj Close" in cached.columns:
+            return cached
 
-    df_raw = yf.download(tickers=ticker, start=start_ts, end=end_ts)
+    df_raw = yf.download(
+        tickers=ticker,
+        start=start_ts,
+        end=end_ts,
+        auto_adjust=False,
+    )
     if df_raw.empty:
         raise ValueError(
             f"Ticker '{ticker}' does not deliver any data - "

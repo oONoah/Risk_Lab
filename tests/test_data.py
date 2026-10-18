@@ -11,6 +11,7 @@ def market_data() -> pd.DataFrame:
         {
             "Open": [100.0, 101.0, 102.0],
             "Close": [101.0, 100.5, 103.0],
+            "Adj Close": [100.5, 100.0, 102.5],
             "Volume": [1000, 1100, 1200],
         },
         index=index,
@@ -58,6 +59,7 @@ def test_fetch_yahoo_downloads_and_caches_data(
             "tickers": "AAPL",
             "start": pd.Timestamp("2026-01-01"),
             "end": pd.Timestamp("2026-01-10"),
+            "auto_adjust": False,
         }
     ]
     assert cache_path.exists()
