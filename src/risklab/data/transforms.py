@@ -62,3 +62,39 @@ def calculate_return(df: pd.DataFrame) -> pd.DataFrame:
     results["RollingReturn20"] = results["Return"].rolling(window=20).mean()
 
     return results
+
+
+def calculate_log_returns(
+    df: pd.DataFrame, price_column: str = "Adj Close"
+) -> pd.Series:
+    """Berechnet logarithmische Close-to-Close-Renditen einer Preisreihe."""
+    prices = _single_price_series(df, price_column)
+    return np.log(prices / prices.shift(1))
+
+
+def _single_price_series(df: pd.DataFrame, price_column: str) -> pd.Series:
+    prices = df[price_column]
+    if isinstance(prices, pd.DataFrame):
+        if prices.shape[1] != 1:
+            raise ValueError(f"'{price_column}' muss genau eine Preisreihe enthalten.")
+        prices = prices.iloc[:, 0]
+
+    return prices
+
+
+def build_portfolio_returns(
+    tickers: list[str], start: str, end: str | None = None
+) -> pd.DataFrame:
+    """Lädt mehrere Ticker und erstellt eine synchronisierte Log-Renditenmatrix."""
+    price_series: dict[str, pd.Series] = {}
+
+    for ticker in tickers:
+        df_raw = fetch_yahoo(ticker, start, end)
+        df_raw = df_raw.copy()
+        df_raw.index = pd.to_datetime(df_raw.index, utc=True).normalize()
+        price_series[ticker] = _single_price_series(df_raw, "Adj Close")
+
+    portfolio_prices = pd.DataFrame(price_series).ffill()
+    log_returns = np.log(portfolio_prices / portfolio_prices.shift(1))
+
+    return log_returns.dropna()
