@@ -1,6 +1,6 @@
 from .var import expected_shortfall, historical_var
 from .backtest import kupiec_pof, kupiec_tff, christoffersen
-from .stress import StressTestEngine, calculate_portfolio_variance
+from .stress import StressTestEngine, calculate_portfolio_variance, calculate_absorption_rate
 
 __all__ = [
     "expected_shortfall",
@@ -10,4 +10,5 @@ __all__ = [
     "christoffersen",
     "StressTestEngine",
     "calculate_portfolio_variance",
+    "calculate_absorption_rate"
 ]

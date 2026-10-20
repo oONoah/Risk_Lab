@@ -14,6 +14,7 @@ from .risk import (
     historical_var,
     kupiec_pof,
     kupiec_tff,
+    calculate_absorption_rate,
 )
 
 __all__ = [
@@ -34,6 +35,7 @@ __all__ = [
     "christoffersen",
     "StressTestEngine",
     "calculate_portfolio_variance",
+    "calculate_absorption_rate"
 ]
 
 __version__ = "0.1.0"
