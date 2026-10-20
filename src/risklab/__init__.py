@@ -6,7 +6,15 @@ from .data import (
     prepare_returns,
 )
 from .portfolio import export_portfolio_returns, import_returns_csv, portfolio_returns, portfolio_variance, covariance_matrix
-from .risk import expected_shortfall, historical_var, kupiec_pof, kupiec_tff, christoffersen
+from .risk import (
+    StressTestEngine,
+    calculate_portfolio_variance,
+    christoffersen,
+    expected_shortfall,
+    historical_var,
+    kupiec_pof,
+    kupiec_tff,
+)
 
 __all__ = [
     "calculate_return",
@@ -23,7 +31,9 @@ __all__ = [
     "covariance_matrix",
     "kupiec_pof",
     "kupiec_tff",
-    "christoffersen"
+    "christoffersen",
+    "StressTestEngine",
+    "calculate_portfolio_variance",
 ]
 
 __version__ = "0.1.0"
