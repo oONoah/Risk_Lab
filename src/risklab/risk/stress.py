@@ -24,6 +24,15 @@ def calculate_portfolio_variance(
     return float(weights_array @ covariance_array @ weights_array)
 
 
+def calculate_absorption_rate(cov_matrix: np.ndarray) -> float:
+    eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
+
+    max_eigenvalue = eigenvalues[-1]
+    total_variance = np.sum(eigenvalues)
+
+    return float(max_eigenvalue/total_variance)    
+
+
 class StressTestEngine:
     def __init__(self, weights: np.ndarray, returns: pd.DataFrame):
         if returns.empty:
