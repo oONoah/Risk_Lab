@@ -33,6 +33,8 @@ def calculate_absorption_rate(cov_matrix: np.ndarray) -> float:
     return float(max_eigenvalue/total_variance)    
 
 
+
+
 class StressTestEngine:
     def __init__(self, weights: np.ndarray, returns: pd.DataFrame):
         if returns.empty:
@@ -59,3 +61,10 @@ class StressTestEngine:
 
         stress_covariance = covariance_matrix(stress_window)
         return portfolio_variance(stress_covariance, self.weights)
+
+    def analyze_regime_breakdown(
+        self,
+        vix_series: pd.Series,
+        threshold: float = 0.95
+    ) -> dict:
+        cov_normal, cov_stress = self.regime_conditional_variance(vix_series, threshold)    
