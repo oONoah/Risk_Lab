@@ -62,6 +62,10 @@ class StressTestEngine:
         stress_covariance = covariance_matrix(stress_window)
         return portfolio_variance(stress_covariance, self.weights)
 
+
+    def regime_conditional_variance() -> float:
+        print()
+
     def analyze_regime_breakdown(
         self,
         vix_series: pd.Series,
