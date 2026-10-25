@@ -9,14 +9,32 @@ def kupiec_pof(
         confidence_level: float = 0.99,
         test_confidence: float = 0.95
 ) -> dict:
-    
+    if observations <= 0:
+        raise ValueError("observations must be positive")
+    if failures < 0 or failures > observations:
+        raise ValueError("failures must be between zero and observations")
+    if not 0 < confidence_level < 1:
+        raise ValueError("confidence_level must be between 0 and 1")
+    if not 0 < test_confidence < 1:
+        raise ValueError("test_confidence must be between 0 and 1")
+
     alpha = 1 - confidence_level
     successes = observations - failures
 
-    theory = confidence_level ** successes * alpha ** failures
-    reality = (1 - (failures/observations))**successes * (failures/observations)**failures
+    # Omit zero-count terms from the log likelihood. This keeps the
+    # boundary cases (zero or all failures) finite and well-defined.
+    expected_log_likelihood = (
+        successes * np.log(confidence_level)
+        + failures * np.log(alpha)
+    )
+    failure_rate = failures / observations
+    empirical_log_likelihood = 0.0
+    if successes:
+        empirical_log_likelihood += successes * np.log(1 - failure_rate)
+    if failures:
+        empirical_log_likelihood += failures * np.log(failure_rate)
 
-    pof = -2*np.log(theory/reality)
+    pof = -2 * (expected_log_likelihood - empirical_log_likelihood)
     
     p_value = 1 - chi2.cdf(pof, df=1)
     critical_value = chi2.ppf(test_confidence, df=1)

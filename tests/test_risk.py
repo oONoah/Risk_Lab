@@ -2,7 +2,31 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from risklab import christoffersen, expected_shortfall, historical_var
+from risklab import (
+    christoffersen,
+    expected_shortfall,
+    historical_var,
+    kupiec_pof,
+)
+
+
+@pytest.mark.parametrize(
+    ("failures", "expected_lr", "expected_rejection"),
+    [
+        (0, -2 * 100 * np.log(0.99), False),
+        (100, -2 * 100 * np.log(0.01), True),
+    ],
+)
+def test_kupiec_pof_handles_boundary_failure_counts(
+    failures: int,
+    expected_lr: float,
+    expected_rejection: bool,
+) -> None:
+    result = kupiec_pof(failures, observations=100)
+
+    assert result["lr_pof"] == pytest.approx(expected_lr)
+    assert np.isfinite(result["p_value"])
+    assert result["is_rejected"] is expected_rejection
 
 
 def test_christoffersen_returns_nan_for_hits_without_failures() -> None:
