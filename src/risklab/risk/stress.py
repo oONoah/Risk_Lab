@@ -65,7 +65,7 @@ class StressTestEngine:
 
     def regime_conditional_variance() -> float:
         print() 
-        #missing test + implementation  s 
+        #missing test + implementation 
 
     def analyze_regime_breakdown(
         self,
