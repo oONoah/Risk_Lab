@@ -63,9 +63,56 @@ class StressTestEngine:
         return portfolio_variance(stress_covariance, self.weights)
 
 
-    def regime_conditional_variance() -> float:
-        print() 
-        #missing test + implementation 
+    def regime_conditional_variance(
+        self,
+        vix_series: pd.Series,
+        threshold: float = 0.95,
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """Return covariance matrices for normal and high-VIX regimes.
+
+        ``threshold`` is interpreted as the quantile of the VIX series that
+        defines the stress regime.  Observations at or below that quantile are
+        treated as normal; observations above it are treated as stress.
+        """
+        if not isinstance(vix_series, pd.Series) or vix_series.empty:
+            raise ValueError("vix_series darf nicht leer sein")
+        if not isinstance(vix_series.index, pd.DatetimeIndex):
+            raise ValueError("vix_series benötigt einen DatetimeIndex")
+        if not 0 < threshold < 1:
+            raise ValueError("threshold muss zwischen 0 und 1 liegen")
+
+        try:
+            numeric_vix = vix_series.astype(float)
+        except (TypeError, ValueError) as error:
+            raise ValueError("vix_series muss numerische Werte enthalten") from error
+
+        numeric_vix = numeric_vix.replace([np.inf, -np.inf], np.nan).dropna()
+        if numeric_vix.empty:
+            raise ValueError("vix_series muss mindestens einen endlichen Wert enthalten")
+
+        aligned_returns = self.returns.join(
+            numeric_vix.rename("_vix"),
+            how="inner",
+        )
+        if aligned_returns.empty:
+            raise ValueError("returns und vix_series enthalten keine gemeinsamen Daten")
+
+        stress_cutoff = aligned_returns["_vix"].quantile(threshold)
+        normal_returns = aligned_returns.loc[
+            aligned_returns["_vix"] <= stress_cutoff,
+            self.returns.columns,
+        ]
+        stress_returns = aligned_returns.loc[
+            aligned_returns["_vix"] > stress_cutoff,
+            self.returns.columns,
+        ]
+
+        if len(normal_returns.dropna(how="any")) < 2:
+            raise ValueError("Normalregime muss mindestens zwei vollständige Beobachtungen enthalten")
+        if len(stress_returns.dropna(how="any")) < 2:
+            raise ValueError("Stressregime muss mindestens zwei vollständige Beobachtungen enthalten")
+
+        return covariance_matrix(normal_returns), covariance_matrix(stress_returns)
 
     def analyze_regime_breakdown(
         self,
