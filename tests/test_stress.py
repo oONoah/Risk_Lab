@@ -89,3 +89,39 @@ def test_regime_conditional_variance_rejects_invalid_threshold(
             pd.Series([10.0, 20.0], index=returns.index),
             threshold,
         )
+
+
+@pytest.mark.parametrize(
+    "vix_series",
+    [
+        pd.Series(dtype=float),
+        pd.Series([float("nan"), float("inf")]),
+        pd.Series(["high", "low"]),
+    ],
+)
+def test_regime_conditional_variance_rejects_invalid_vix(
+    vix_series: pd.Series,
+) -> None:
+    returns = pd.DataFrame(
+        {"AAPL": [0.1, 0.2]},
+        index=pd.date_range("2020-02-01", periods=2, freq="D"),
+    )
+    if len(vix_series) == len(returns):
+        vix_series.index = returns.index
+
+    with pytest.raises(ValueError):
+        StressTestEngine([1.0], returns).regime_conditional_variance(vix_series)
+
+
+def test_regime_conditional_variance_rejects_missing_dates() -> None:
+    returns = pd.DataFrame(
+        {"AAPL": [0.1, 0.2]},
+        index=pd.date_range("2020-02-01", periods=2, freq="D"),
+    )
+    vix = pd.Series(
+        [10.0, 20.0],
+        index=pd.date_range("2021-02-01", periods=2, freq="D"),
+    )
+
+    with pytest.raises(ValueError):
+        StressTestEngine([1.0], returns).regime_conditional_variance(vix)
