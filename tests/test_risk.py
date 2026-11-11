@@ -7,6 +7,7 @@ from risklab import (
     expected_shortfall,
     historical_var,
     kupiec_pof,
+    kupiec_tff,
 )
 
 
@@ -27,6 +28,14 @@ def test_kupiec_pof_handles_boundary_failure_counts(
     assert result["lr_pof"] == pytest.approx(expected_lr)
     assert np.isfinite(result["p_value"])
     assert result["is_rejected"] is expected_rejection
+
+
+def test_kupiec_tff_calculates_time_until_first_failure_statistic() -> None:
+    result = kupiec_tff(first_failure_day=10)
+
+    assert result["lr_tff"] == pytest.approx(2.8895869495)
+    assert result["p_value"] == pytest.approx(0.0891537799)
+    assert result["is_rejected"] is False
 
 
 def test_christoffersen_returns_nan_for_hits_without_failures() -> None:
