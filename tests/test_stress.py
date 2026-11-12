@@ -2,7 +2,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from risklab import StressTestEngine, calculate_portfolio_variance
+from risklab import (
+    StressTestEngine,
+    calculate_absorption_rate,
+    calculate_portfolio_variance,
+)
 from risklab.portfolio.returns import covariance_matrix
 
 
@@ -12,6 +16,12 @@ def test_calculate_portfolio_variance() -> None:
     assert calculate_portfolio_variance(np.array([0.5, 0.5]), covariance) == pytest.approx(
         0.0375
     )
+
+
+def test_calculate_absorption_rate_returns_largest_variance_share() -> None:
+    covariance = np.diag([1.0, 3.0])
+
+    assert calculate_absorption_rate(covariance) == pytest.approx(0.75)
 
 
 def test_historical_shock_uses_selected_window() -> None:
