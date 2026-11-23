@@ -35,7 +35,7 @@ def test_historical_shock_uses_selected_window() -> None:
 
     result = StressTestEngine([0.5, 0.5], returns).apply_historical_shock(
         "2020-02-01",
-        "2020-02-02",s
+        "2020-02-02",
     )
 
     assert result == pytest.approx(0.01125)

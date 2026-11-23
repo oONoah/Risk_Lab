@@ -119,4 +119,13 @@ class StressTestEngine:
         vix_series: pd.Series,
         threshold: float = 0.95
     ) -> dict:
-        cov_normal, cov_stress = self.regime_conditional_variance(vix_series, threshold)    
+        if not isinstance(vix_series, pd.Series):
+            raise TypeError("vix_series muss eine pandas Series sein")
+        if vix_series.empty:
+            raise ValueError("vix_series darf nicht leer sein")
+        if not isinstance(threshold, (int, float)) or not np.isfinite(threshold):
+            raise ValueError("threshold muss eine endliche Zahl sein")
+        if not 0 < threshold < 1:
+            raise ValueError("threshold muss zwischen 0 und 1 liegen")
+
+        cov_normal, cov_stress = self.regime_conditional_variance(vix_series, threshold)
