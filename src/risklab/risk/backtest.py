@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import stats
 from scipy.stats import chi2
 
 # Portion of Failure
@@ -116,4 +117,8 @@ def christoffersen(
         "p_value": float(p_value),
         "is_rejected": bool(is_rejected)
     }
+
+    def dynamicQuantile (returns, var_forecast, alpha=0.05, lags=4):
+        return 0
+
     
